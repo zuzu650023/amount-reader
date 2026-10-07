@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0A66C2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="金額念法">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>金額快速念法</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif;color:#172033;background:#eef2f7}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;min-height:100dvh;background:linear-gradient(180deg,#ddecff 0,#f5f7fb 35%);padding:env(safe-area-inset-top) 14px env(safe-area-inset-bottom)}main{max-width:520px;margin:auto;padding:12px 0 18px}h1{font-size:22px;text-align:center;margin:8px 0 14px}.card{background:#fff;border-radius:22px;padding:17px;box-shadow:0 8px 28px #27496d18;margin-bottom:13px}.label{font-size:14px;color:#657187;margin-bottom:8px}.number{font-size:38px;font-weight:800;text-align:right;white-space:nowrap;overflow-x:auto;min-height:48px;font-variant-numeric:tabular-nums}.reading{font-size:26px;line-height:1.45;font-weight:700;min-height:76px;overflow-wrap:anywhere}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}.actions button{background:#0a66c2;color:white}.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.key,.quick,.actions button{border:0;border-radius:17px;font-weight:750;touch-action:manipulation}.key{height:62px;font-size:26px;background:#fff;color:#182337;box-shadow:0 4px 14px #27496d16}.key:active,.quick:active,.actions button:active{transform:scale(.96)}.utility{color:#d66b00}.quickrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.quick{height:47px;font-size:19px;color:#0a66c2;background:#e8f2ff;border:2px solid #a8cff7}.hint{text-align:center;color:#6f7b8d;font-size:12px;margin-top:12px}.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#172033;color:#fff;padding:9px 16px;border-radius:18px;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}
+</style></head><body><main>
+<h1>金額快速念法</h1>
+<section class="card"><div class="label">輸入金額</div><div class="number" id="number">0</div><div class="label" style="margin-top:8px">最多 16 位數，支援至 9999 兆級</div></section>
+<section class="card"><div class="label">中文念法</div><div class="reading" id="reading">請輸入金額</div><div class="actions"><button id="copy">複製</button><button id="speak">🔊 唸出來</button></div></section>
+<section class="keypad" id="keypad"></section><div class="quickrow"><button class="quick" data-key="00">00</button><button class="quick" data-key="000">000</button></div>
+<div class="hint">金額只在你的裝置內轉換，不會上傳</div></main><div class="toast" id="toast">已複製</div>
+<script>
+const D=['零','一','二','三','四','五','六','七','八','九'],S=['','十','百','千'],B=['','萬','億','兆'];let v='';
+function four(n){let s=String(n).padStart(4,'0'),r='',z=false;for(let i=0;i<4;i++){let d=+s[i],p=3-i;if(!d){if(r)z=true}else{if(z){r+='零';z=false}r+=D[d]+S[p]}}return r}
+function chinese(x){x=x.replace(/^0+/,'');if(!x)return v?'零':'請輸入金額';let g=[];while(x){g.unshift(x.slice(-4));x=x.slice(0,-4)}let r='',z=false;g.forEach((q,i)=>{let n=+q,u=g.length-1-i;if(!n){if(r)z=true;return}if(r&&(z||n<1000)&&!r.endsWith('零'))r+='零';r+=four(n)+B[u];z=false});if(r.startsWith('一十'))r=r.slice(1);return r}
+function formatted(){return v?v.replace(/\B(?=(\d{3})+(?!\d))/g,','):'0'}
+function render(){number.textContent=formatted();reading.textContent=chinese(v);copy.disabled=speak.disabled=!v}
+function add(k){if(k==='清除')v='';else if(k==='⌫')v=v.slice(0,-1);else if(v.length+k.length<=16){if(v==='0')v='';v+=k}render()}
+const keys=['1','2','3','4','5','6','7','8','9','清除','0','⌫'];keys.forEach(k=>{let b=document.createElement('button');b.className='key '+((k==='清除'||k==='⌫')?'utility':'');b.textContent=k;b.onclick=()=>add(k);keypad.appendChild(b)});document.querySelectorAll('[data-key]').forEach(b=>b.onclick=()=>add(b.dataset.key));
+copy.onclick=async()=>{try{await navigator.clipboard.writeText(chinese(v))}catch{let t=document.createElement('textarea');t.value=chinese(v);document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1000)};
+speak.onclick=()=>{speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(chinese(v));u.lang='zh-TW';u.rate=.78;speechSynthesis.speak(u)};
+render();if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
+</script></body></html>

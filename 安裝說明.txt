@@ -1,0 +1,17 @@
+金額快速念法 Web App
+
+Windows 發布到 GitHub Pages：
+1. 登入 GitHub，建立新的 Public repository，例如 amount-reader。
+2. 點 Add file > Upload files。
+3. 將此資料夾內全部檔案拖入上傳並 Commit changes。
+4. 進入 Settings > Pages。
+5. Source 選 Deploy from a branch，Branch 選 main，資料夾選 /(root)，按 Save。
+6. 發布完成後，到 Pages 頁面按 Visit site。
+
+iPhone 安裝：
+1. 用 Safari 開啟發布網址。
+2. 點分享。
+3. 點加入主畫面。
+4. 開啟「作為網頁 App 打開」後按加入。
+
+注意：不要輸入真實敏感資料到公開網站檔案中。本工具本身不會儲存或上傳輸入金額。
